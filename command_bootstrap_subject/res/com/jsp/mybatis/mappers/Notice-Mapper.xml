@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- 파일명과 동일하게 해주는게 보기편하다. -->
+ 
+<mapper namespace="Notice-Mapper">
+	<sql id="search">	
+		<if test="searchType == 't'.toString()">
+			and title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and writer like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and content like '%'||#{keyword}||'%'			
+		</if>		
+		<if test="searchType == 'wc'.toString()">
+			and (writer like '%'||#{keyword}||'%' or content like '%'||#{keyword}||'%')			
+		</if>		
+		<if test="searchType == 'tc'.toString()">
+			and (title like '%'||#{keyword}||'%' or content like '%'||#{keyword}||'%')			
+		</if>		
+		<if test="searchType == 'tw'.toString()">
+			and (title like '%'||#{keyword}||'%' or writer like '%'||#{keyword}||'%')			
+		</if>		
+		<if test="searchType == 'twc'.toString()">
+			and (title like '%'||#{keyword}||'%' or writer like '%'||#{keyword}||'%' or content like '%'||#{keyword}||'%')			
+		</if>		
+	</sql>	
+	
+	<select id="selectNoticeByNno" resultType="notice">
+	 	select
+        *
+        from notice
+        where nno=#{nno}
+        
+	</select>
+	
+	<select id="selectSearchNoticeList" resultType="notice">
+		select
+		* 
+		from notice
+		where nno is not null and dist = 'N'
+		<include refid="search"/>
+		order by nno desc
+	</select>
+	
+	<select id="selectSearchNoticeListCount" resultType="int">
+		select
+		count(*) 
+		from notice
+		where nno is not null and dist = 'N'
+		<include refid="search"/>
+	</select>
+	
+	<update id="insertNotice" parameterType="notice">
+		insert into notice(nno,title,writer,content,startdate,enddate)
+		values((select max(nno) from notice)+1,#{title},#{writer},#{content},#{startDate,jdbcType=TIMESTAMP},#{endDate,jdbcType=TIMESTAMP})
+	</update>
+	
+	<update id="updateNotice" parameterType="notice">
+		update notice
+        set
+        title=#{title},content=#{content},startdate=#{startDate,jdbcType=TIMESTAMP},enddate=#{endDate,jdbcType=TIMESTAMP},updatedate=sysdate
+        where nno=#{nno}
+	</update>
+	
+	<update id="deleteNotice" parameterType="int">
+		delete
+        from notice
+        where nno=#{nno}
+	</update>
+	
+	<update id="updateNoticeView" parameterType="int">
+		update notice
+		set viewcnt = viewcnt+1
+		where nno=#{nno}
+	</update>
+	
+	<update id="updateNoticePoint" parameterType="int">
+		update notice
+		set point = point+1
+		where nno=#{nno}
+	</update>
+	
+	<update id="updateDist">
+			update notice
+	        set dist = 'Y'
+	        where enddate <![CDATA[<]]> sysdate and enddate is not null
+	</update>
+	
+	
+</mapper>

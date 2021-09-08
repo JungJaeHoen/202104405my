@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans>
+	
+	<!-- dataSource -->
+	<bean id="sqlSessionFactory" class="com.jsp.datasource.OracleMybatisSqlSessionFactory"/>
+	
+	<!-- Repository Layer -->
+	<bean id="memberDAO" class="com.jsp.dao.MemberDAOImpl" />
+	<bean id="menuDAO" class="com.jsp.dao.MenuDAOImpl" />
+	<bean id="noticeDAO" class="com.jsp.dao.NoticeDAOImpl" />
+	
+	<!-- Service layer -->
+	<bean id="memberService" class="com.jsp.service.MemberServiceImpl">
+			<property name="sqlSessionFactory" ref-value="sqlSessionFactory"/>
+			<property name="memberDAO" ref-value="memberDAO"/>
+	</bean>
+	
+	<bean id="menuService" class="com.jsp.service.MenuServiceImpl">
+			<property name="sqlSessionFactory" ref-value="sqlSessionFactory"/>
+			<property name="menuDAO" ref-value="menuDAO"/>
+	</bean>
+	<bean id="noticeService" class="com.jsp.service.NoticeServiceImpl">
+			<property name="sqlSessionFactory" ref-value="sqlSessionFactory"/>
+			<property name="noticeDAO" ref-value="noticeDAO"/>
+	</bean>
+	
+	
+</beans>
+
